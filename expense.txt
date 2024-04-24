@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Expense Tracker</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Additional Styles */
+    /* Add your custom styles here */
+  </style>
+</head>
+<body>
+  <div class="container mt-5">
+    <h1>Expense Tracker</h1>
+    <div class="form-group">
+      <label for="expense">Choose Expense:</label>
+      <input type="number" class="form-control" id="expense" placeholder="Enter expense">
+    </div>
+    <div class="form-group">
+      <label for="description">Choose Description:</label>
+      <input type="text" class="form-control" id="description" placeholder="Enter description">
+    </div>
+    <div class="form-group">
+      <label for="category">Choose a Category:</label>
+      <select class="form-control" id="category">
+        <option value="Food">Food</option>
+        <option value="Transportation">Transportation</option>
+        <option value="Utilities">Utilities</option>
+        <!-- Add more options as needed -->
+      </select>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="addExpense()">Add Expense</button>
+    <hr>
+    <h2>Expense List</h2>
+    <ul id="expenseList" class="list-group">
+      <!-- Display expenses here -->
+    </ul>
+  </div>
+
+  <script>
+    // Function to add expense
+    function addExpense() {
+      const expense = document.getElementById('expense').value;
+      const description = document.getElementById('description').value;
+      const category = document.getElementById('category').value;
+
+      if (expense !== '') {
+        const expenseItem = { expense, description, category };
+        addToLocalStorage(expenseItem);
+        displayExpenses();
+      } else {
+        alert('Please enter an expense amount.');
+      }
+    }
+
+    // Function to add expense to local storage
+    function addToLocalStorage(expenseItem) {
+      let expenses = [];
+      if (localStorage.getItem('expenses')) {
+        expenses = JSON.parse(localStorage.getItem('expenses'));
+      }
+      expenses.push(expenseItem);
+      localStorage.setItem('expenses', JSON.stringify(expenses));
+    }
+
+    // Function to display expenses
+    function displayExpenses() {
+      const expenseList = document.getElementById('expenseList');
+      expenseList.innerHTML = '';
+      let expenses = [];
+      if (localStorage.getItem('expenses')) {
+        expenses = JSON.parse(localStorage.getItem('expenses'));
+      }
+      expenses.forEach((expense, index) => {
+        const listItem = document.createElement('li');
+        listItem.className = 'list-group-item';
+        listItem.innerHTML = `
+          Expense: $${expense.expense} - Description: ${expense.description} - Category: ${expense.category}
+          <button type="button" class="btn btn-danger btn-sm float-right" onclick="deleteExpense(${index})">Delete</button>
+          <button type="button" class="btn btn-secondary btn-sm float-right mr-2" onclick="editExpense(${index})">Edit</button>
+        `;
+        expenseList.appendChild(listItem);
+      });
+    }
+
+    // Function to delete expense
+    function deleteExpense(index) {
+      let expenses = JSON.parse(localStorage.getItem('expenses'));
+      expenses.splice(index, 1);
+      localStorage.setItem('expenses', JSON.stringify(expenses));
+      displayExpenses();
+    }
+
+    // Function to edit expense
+    function editExpense(index) {
+      let expenses = JSON.parse(localStorage.getItem('expenses'));
+      const editedExpense = expenses[index];
+      const newExpense = prompt('Enter new expense amount:', editedExpense.expense);
+      if (newExpense !== null) {
+        editedExpense.expense = newExpense;
+        localStorage.setItem('expenses', JSON.stringify(expenses));
+        displayExpenses();
+      }
+    }
+
+    // Display existing expenses on page load
+    displayExpenses();
+  </script>
+</body>
+</html>
